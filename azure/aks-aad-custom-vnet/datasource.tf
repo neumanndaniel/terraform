@@ -1,34 +1,39 @@
+data "azurerm_key_vault" "k8s" {
+  name                = var.key_vault_name
+  resource_group_name = var.key_vault_resource_group_name
+}
+
 data "azurerm_key_vault_secret" "ssh" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "sshpublic"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "spid" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aksspid"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "spsecret" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aksspsecret"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "aadclient" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aadClientAppId"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "aadserver" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aadServerAppId"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "aadserversecret" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aadServerAppSecret"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
 
 data "azurerm_key_vault_secret" "aadtenant" {
-  name      = "REDACTED"
-  vault_uri = "${var.vault_uri}"
+  name      = "aadTenantId"
+  key_vault_id = data.azurerm_key_vault.k8s.id
 }
