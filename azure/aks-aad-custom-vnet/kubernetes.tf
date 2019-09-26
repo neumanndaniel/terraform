@@ -1,6 +1,6 @@
 resource "kubernetes_cluster_role_binding" "k8s" {
   metadata {
-    name = "${var.cluster_role_binding_name}"
+    name = var.cluster_role_binding_name
   }
 
   role_ref {
@@ -12,6 +12,6 @@ resource "kubernetes_cluster_role_binding" "k8s" {
   subject {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Group"
-    name      = "${var.aad_group_guid}"
+    name      = var.aad_group_guid
   }
 }
