@@ -67,7 +67,7 @@ variable "network_plugin" {
 }
 
 variable "network_policy" {
-  default = "azure"
+  default = "calico"
 }
 
 variable "lb_sku" {
