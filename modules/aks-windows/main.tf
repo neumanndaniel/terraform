@@ -2,7 +2,7 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 1.35"
+  version = "~> 1.37"
 }
 
 provider "azuread" {
@@ -61,6 +61,12 @@ resource "azurerm_resource_group" "aks" {
 }
 
 resource "azurerm_kubernetes_cluster" "aks" {
+  lifecycle {
+    ignore_changes = [
+      default_node_pool[0].node_count
+    ]
+  }
+
   name                = var.name
   location            = azurerm_resource_group.aks.location
   resource_group_name = azurerm_resource_group.aks.name
@@ -73,20 +79,19 @@ resource "azurerm_kubernetes_cluster" "aks" {
     admin_password = random_password.aks.result
   }
 
-  dynamic "agent_pool_profile" {
-    for_each = var.agent_pool_configuration
-    content {
-      name               = format("pool%d", agent_pool_profile.key + 1)
-      count              = agent_pool_profile.value["agent_count"]
-      vm_size            = agent_pool_profile.value["vm_size"]
-      type               = "VirtualMachineScaleSets"
-      availability_zones = agent_pool_profile.value["zones"]
-      max_pods           = 250
-      os_type            = agent_pool_profile.value["agent_os"]
-      os_disk_size_gb    = 128
-      vnet_subnet_id     = var.vnet_subnet_id
-      node_taints        = agent_pool_profile.value["taints"]
-    }
+  default_node_pool {
+    name                = substr(var.default_node_pool.name, 0, 12)
+    node_count          = var.default_node_pool.node_count
+    vm_size             = var.default_node_pool.vm_size
+    type                = "VirtualMachineScaleSets"
+    availability_zones  = var.default_node_pool.zones
+    max_pods            = 250
+    os_disk_size_gb     = 128
+    vnet_subnet_id      = var.vnet_subnet_id
+    node_taints         = var.default_node_pool.taints
+    enable_auto_scaling = var.default_node_pool.cluster_auto_scaling
+    min_count           = var.default_node_pool.cluster_auto_scaling_min_count
+    max_count           = var.default_node_pool.cluster_auto_scaling_max_count
   }
 
   service_principal {
@@ -123,6 +128,30 @@ resource "azurerm_kubernetes_cluster" "aks" {
     docker_bridge_cidr = "172.17.0.1/16"
     service_cidr       = "10.0.0.0/16"
   }
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "aks" {
+  lifecycle {
+    ignore_changes = [
+      node_count
+    ]
+  }
+
+  for_each = var.additional_node_pools
+
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  name                  = each.value.node_os == "Windows" ? substr(each.key, 0, 6) : substr(each.key, 0, 12)
+  node_count            = each.value.node_count
+  vm_size               = each.value.vm_size
+  availability_zones    = each.value.zones
+  max_pods              = 250
+  os_disk_size_gb       = 128
+  os_type               = each.value.node_os
+  vnet_subnet_id        = var.vnet_subnet_id
+  node_taints           = each.value.taints
+  enable_auto_scaling   = each.value.cluster_auto_scaling
+  min_count             = each.value.cluster_auto_scaling_min_count
+  max_count             = each.value.cluster_auto_scaling_max_count
 }
 
 resource "azurerm_role_assignment" "aks" {

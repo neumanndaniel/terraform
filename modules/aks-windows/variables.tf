@@ -58,13 +58,30 @@ variable "aad_group_name" {
   type        = string
 }
 
-variable "agent_pool_configuration" {
-  description = "The list object to configure one or several node pools with number of worker nodes, worker node VM size and Availability Zones."
-  type = list(object({
-    agent_count = number
-    vm_size     = string
-    zones       = list(string)
-    agent_os    = string
-    taints      = list(string)
+variable "default_node_pool" {
+  description = "The object to configure the default node pool with number of worker nodes, worker node VM size and Availability Zones."
+  type = object({
+    name                           = string
+    node_count                     = number
+    vm_size                        = string
+    zones                          = list(string)
+    taints                         = list(string)
+    cluster_auto_scaling           = bool
+    cluster_auto_scaling_min_count = number
+    cluster_auto_scaling_max_count = number
+  })
+}
+
+variable "additional_node_pools" {
+  description = "The map object to configure one or several additional node pools with number of worker nodes, worker node VM size and Availability Zones."
+  type = map(object({
+    node_count                     = number
+    vm_size                        = string
+    zones                          = list(string)
+    node_os                        = string
+    taints                         = list(string)
+    cluster_auto_scaling           = bool
+    cluster_auto_scaling_min_count = number
+    cluster_auto_scaling_max_count = number
   }))
 }
