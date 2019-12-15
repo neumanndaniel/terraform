@@ -58,6 +58,11 @@ variable "aad_group_name" {
   type        = string
 }
 
+variable "api_auth_ips" {
+  description = "Whitelist of IP addresses that are allowed to access the AKS Master Control Plane API"
+  type        = list(string)
+}
+
 variable "default_node_pool" {
   description = "The object to configure the default node pool with number of worker nodes, worker node VM size and Availability Zones."
   type = object({

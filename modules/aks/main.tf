@@ -67,12 +67,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
     ]
   }
 
-  name                = var.name
-  location            = azurerm_resource_group.aks.location
-  resource_group_name = azurerm_resource_group.aks.name
-  dns_prefix          = var.name
-  kubernetes_version  = var.kubernetes_version
-  node_resource_group = "${var.name}-worker"
+  name                            = var.name
+  location                        = azurerm_resource_group.aks.location
+  resource_group_name             = azurerm_resource_group.aks.name
+  dns_prefix                      = var.name
+  kubernetes_version              = var.kubernetes_version
+  node_resource_group             = "${var.name}-worker"
+  api_server_authorized_ip_ranges = var.api_auth_ips
 
   default_node_pool {
     name                = substr(var.default_node_pool.name, 0, 12)
