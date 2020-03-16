@@ -2,7 +2,8 @@
 # Providers section #
 #####################
 provider "azurerm" {
-  version = "~> 1.35"
+  version = "~> 2.0.0"
+  features {}
 }
 #####################
 # Resources section #

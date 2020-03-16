@@ -2,7 +2,8 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 1.35"
+  version = "~> 2.0.0"
+  features {}
 }
 #####################
 # Resources section #
@@ -20,7 +21,5 @@ resource "azurerm_storage_account" "storage" {
   account_tier              = var.tier
   account_replication_type  = var.replication_type
   access_tier               = var.access_tier
-  enable_blob_encryption    = true
-  enable_file_encryption    = true
   enable_https_traffic_only = true
 }

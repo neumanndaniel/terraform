@@ -2,7 +2,8 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 1.37"
+  version = "~> 2.0.0"
+  features {}
 }
 
 provider "azuread" {
