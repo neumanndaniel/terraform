@@ -2,7 +2,7 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 2.0.0"
+  version = "~> 2.2.0"
   features {}
 }
 
@@ -28,6 +28,8 @@ provider "kubernetes" {
 provider "random" {
   version = "~> 2.2"
 }
+
+provider "null" {}
 ########################
 # Data sources section #
 ########################
@@ -124,6 +126,17 @@ resource "azurerm_kubernetes_cluster" "aks" {
     dns_service_ip     = "10.0.0.10"
     docker_bridge_cidr = "172.17.0.1/16"
     service_cidr       = "10.0.0.0/16"
+  }
+}
+
+resource "null_resource" "aks" {
+  triggers = {
+    aks_kubernetes_version = azurerm_kubernetes_cluster.aks.kubernetes_version
+  }
+
+  provisioner "local-exec" {
+    command     = "./cluster-upgrade-fix.sh ${var.name} ${azurerm_resource_group.aks.name}"
+    working_dir = path.module
   }
 }
 
