@@ -2,16 +2,16 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 2.2.0"
+  version = "~> 2.4.0"
   features {}
 }
 
 provider "azuread" {
-  version = "~> 0.6"
+  version = ">= 0.6"
 }
 
 provider "kubernetes" {
-  version = "~> 1.9"
+  version = ">= 1.9"
 
   host = azurerm_kubernetes_cluster.aks.kube_admin_config[0].host
   client_certificate = base64decode(
@@ -26,14 +26,14 @@ provider "kubernetes" {
 }
 
 provider "random" {
-  version = "~> 2.2"
+  version = ">= 2.2"
 }
 
 provider "null" {}
 ########################
 # Data sources section #
 ########################
-data "azuread_group" "aks_cluster_admin" {
+data "azuread_group" "aks" {
   name = var.aad_group_name
 }
 #####################
@@ -58,11 +58,6 @@ resource "azuread_service_principal_password" "aks" {
   end_date_relative    = "8760h"
 }
 
-resource "azurerm_resource_group" "aks" {
-  name     = var.resource_group_name
-  location = var.location
-}
-
 resource "azurerm_kubernetes_cluster" "aks" {
   lifecycle {
     ignore_changes = [
@@ -71,8 +66,8 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   name                            = var.name
-  location                        = azurerm_resource_group.aks.location
-  resource_group_name             = azurerm_resource_group.aks.name
+  location                        = var.location
+  resource_group_name             = var.resource_group_name
   dns_prefix                      = var.name
   kubernetes_version              = var.kubernetes_version
   node_resource_group             = "${var.name}-worker"
@@ -117,6 +112,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
     kube_dashboard {
       enabled = false
     }
+    azure_policy {
+      enabled = false
+    }
   }
 
   network_profile {
@@ -135,7 +133,7 @@ resource "null_resource" "aks" {
   }
 
   provisioner "local-exec" {
-    command     = "./cluster-upgrade-fix.sh ${var.name} ${azurerm_resource_group.aks.name}"
+    command     = "./cluster-upgrade-fix.sh ${var.name} ${var.resource_group_name}"
     working_dir = path.module
   }
 }
@@ -176,7 +174,7 @@ resource "azurerm_role_assignment" "aks_subnet" {
   principal_id         = azuread_service_principal.aks.id
 }
 
-resource "azurerm_role_assignment" "acr" {
+resource "azurerm_role_assignment" "aks_acr" {
   scope                = var.container_registry_id
   role_definition_name = "AcrPull"
   principal_id         = azuread_service_principal.aks.id
@@ -196,6 +194,6 @@ resource "kubernetes_cluster_role_binding" "aks" {
   subject {
     api_group = "rbac.authorization.k8s.io"
     kind      = "Group"
-    name      = data.azuread_group.aks_cluster_admin.id
+    name      = data.azuread_group.aks.id
   }
 }

@@ -2,21 +2,16 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = "~> 2.0.0"
+  version = ">= 2.0.0"
   features {}
 }
 #####################
 # Resources section #
 #####################
-resource "azurerm_resource_group" "storage" {
-  name     = var.resource_group_name
-  location = var.location
-}
-
 resource "azurerm_storage_account" "storage" {
   name                      = var.name
-  resource_group_name       = azurerm_resource_group.storage.name
-  location                  = azurerm_resource_group.storage.location
+  location                  = var.location
+  resource_group_name       = var.resource_group_name
   account_kind              = var.kind
   account_tier              = var.tier
   account_replication_type  = var.replication_type
