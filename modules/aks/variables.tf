@@ -33,26 +33,6 @@ variable "vnet_subnet_id" {
   type        = string
 }
 
-variable "aad_client_application_id" {
-  description = "Client application id for AAD integration"
-  type        = string
-}
-
-variable "aad_server_application_id" {
-  description = "Server application id for AAD integration"
-  type        = string
-}
-
-variable "aad_server_application_secret" {
-  description = "Server application secret for AAD integration"
-  type        = string
-}
-
-variable "aad_tenant_id" {
-  description = "AAD tenant id for AAD integration"
-  type        = string
-}
-
 variable "aad_group_name" {
   description = "Name of the Azure AD group for cluster-admin access"
   type        = string
@@ -63,6 +43,16 @@ variable "api_auth_ips" {
   type        = list(string)
 }
 
+variable "private_cluster" {
+  description = "Deploy an AKS cluster without a public accessible API endpoint."
+  type        = bool
+}
+
+variable "sla_sku" {
+  description = "Define the SLA under which the managed master control plane of AKS is running."
+  type        = string
+}
+
 variable "default_node_pool" {
   description = "The object to configure the default node pool with number of worker nodes, worker node VM size and Availability Zones."
   type = object({
@@ -70,6 +60,7 @@ variable "default_node_pool" {
     node_count                     = number
     vm_size                        = string
     zones                          = list(string)
+    labels                         = map(string)
     taints                         = list(string)
     cluster_auto_scaling           = bool
     cluster_auto_scaling_min_count = number
@@ -83,9 +74,20 @@ variable "additional_node_pools" {
     node_count                     = number
     vm_size                        = string
     zones                          = list(string)
+    labels                         = map(string)
     taints                         = list(string)
+    node_os                        = string
     cluster_auto_scaling           = bool
     cluster_auto_scaling_min_count = number
     cluster_auto_scaling_max_count = number
   }))
+}
+
+variable "addons" {
+  description = "Defines which addons will be activated."
+  type = object({
+    oms_agent            = bool
+    kubernetes_dashboard = bool
+    azure_policy         = bool
+  })
 }
