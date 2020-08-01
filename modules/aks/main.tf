@@ -2,19 +2,13 @@
 # Provider section #
 ####################
 provider "azurerm" {
-  version = ">= 2.15.0"
+  version = ">= 2.21.0"
   features {}
 }
 
 provider "azuread" {
   version = ">= 0.6"
 }
-
-provider "random" {
-  version = ">= 2.2"
-}
-
-provider "null" {}
 ########################
 # Data sources section #
 ########################
