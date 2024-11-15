@@ -9,8 +9,9 @@ resource "azurerm_security_center_automation" "continuous_export" {
   enabled = true
 
   action {
-    type        = "loganalytics"
-    resource_id = var.log_analytics_workspace_id
+    type              = var.type
+    resource_id       = var.type == "loganalytics" ? var.log_analytics_workspace_id : var.eventhub_id
+    connection_string = var.type == "eventhub" ? var.eventhub_connection_string : null
   }
 
   source {

@@ -15,4 +15,26 @@ variable "location" {
 
 variable "log_analytics_workspace_id" {
   description = "The resource id of the Log Analytics workspace"
+  default     = null
+}
+
+variable "type" {
+  description = "The type of continuous export configuration"
+  type        = string
+  default     = "loganalytics"
+  validation {
+    condition     = var.type == "loganalytics" || var.type == "eventhub"
+    error_message = "The type of continuous export configuration must be either 'loganalytics' or 'eventhub'"
+  }
+}
+
+variable "eventhub_id" {
+  description = "The resource id of the Event Hub"
+  default     = null
+}
+
+variable "eventhub_connection_string" {
+  description = "The connection string of the Event Hub"
+  sensitive   = true
+  default     = null
 }
